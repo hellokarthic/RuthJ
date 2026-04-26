@@ -1,0 +1,9 @@
+streamlit>=1.32,<2.0
+opencv-python-headless>=4.9,<5.0
+scikit-image>=0.22,<0.24
+numpy>=1.24,<2.0
+pandas>=2.0,<3.0
+matplotlib>=3.7,<4.0
+Pillow>=10.0,<11.0
+scipy>=1.11,<2.0
+easyocr>=1.7,<2.0
