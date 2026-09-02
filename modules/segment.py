@@ -16,6 +16,18 @@ def _apply_threshold(gray: np.ndarray, method: str, manual_val: int) -> Tuple[np
         t, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return binary, int(t)
 
+    if method == "Multi-Otsu (all crystals)":
+        # 3-class split: background | gray crystals | bright inclusions
+        # Taking everything above the first threshold captures both crystal classes.
+        try:
+            thresholds = threshold_multiotsu(gray, classes=3)
+            t = int(thresholds[0])
+        except Exception:
+            t, _ = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            t = int(t)
+        _, binary = cv2.threshold(gray, t, 255, cv2.THRESH_BINARY)
+        return binary, t
+
     if method == "Manual":
         _, binary = cv2.threshold(gray, manual_val, 255, cv2.THRESH_BINARY)
         return binary, manual_val
@@ -319,8 +331,7 @@ def segment_faint_crystals(
     nudge = int((50 - sensitivity) * thresh_low / 50) if thresh_low > 0 else 0
     effective_low = max(1, thresh_low - nudge)
 
-    faint_mask = (tophat >= effective_low) & (tophat < thresh_high)
-    faint_mask = faint_mask & (bright_labeled == 0)
+    faint_mask = (tophat >= effective_low) & (bright_labeled == 0)
 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     faint_u8 = faint_mask.astype(np.uint8) * 255

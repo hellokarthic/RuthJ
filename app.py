@@ -126,7 +126,7 @@ with st.sidebar:
     st.header("Segmentation")
     thresh_method = st.selectbox(
         "Threshold method",
-        ["Otsu", "Manual", "Adaptive", "Top % bright"],
+        ["Multi-Otsu (all crystals)", "Otsu", "Manual", "Adaptive", "Top % bright"],
     )
     if thresh_method == "Manual":
         manual_val = st.slider("Threshold value (0–255)", 0, 255, 160, 1)
@@ -197,7 +197,7 @@ with st.sidebar:
     st.header("Size Filter")
     sz1, sz2 = st.columns(2)
     with sz1:
-        min_size_nm = st.number_input("Min diameter (nm)", 50, 5000, 200, 50)
+        min_size_nm = st.number_input("Min diameter (nm)", 50, 5000, 100, 50)
     with sz2:
         max_size_nm = st.number_input("Max diameter (nm)", 200, 50000, 10000, 100)
 
@@ -333,9 +333,9 @@ if n_bright > 0:
         color = (int(b * 255), int(g * 255), int(r * 255))
         colored = np.zeros_like(overlay)
         colored[mask > 0] = color
-        overlay = cv2.addWeighted(overlay, 1.0, colored, 0.35, 0)
+        overlay = cv2.addWeighted(overlay, 1.0, colored, 0.50, 0)
         cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(overlay, cnts, -1, color, 1)
+        cv2.drawContours(overlay, cnts, -1, color, 2)
 
 if detect_faint and n_faint > 0:
     CYAN = (255, 230, 80)
@@ -344,7 +344,7 @@ if detect_faint and n_faint > 0:
         mask  = (labeled_faint == lbl).astype(np.uint8)
         colored = np.zeros_like(overlay)
         colored[mask > 0] = CYAN
-        overlay = cv2.addWeighted(overlay, 1.0, colored, 0.25, 0)
+        overlay = cv2.addWeighted(overlay, 1.0, colored, 0.40, 0)
         cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cv2.drawContours(overlay, cnts, -1, CYAN, 2)
 
