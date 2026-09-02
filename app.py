@@ -372,7 +372,7 @@ col_orig, col_overlay, col_binary = st.columns(3)
 
 with col_orig:
     st.subheader("Original")
-    st.image(img_area_rgb, use_container_width=True)
+    st.image(img_area_rgb, width="stretch")
     h_um = img_area_rgb.shape[0] * nm_per_pixel / 1000
     w_um = img_area_rgb.shape[1] * nm_per_pixel / 1000
     st.caption(f"Image area: {w_um:.1f} × {h_um:.1f} µm  |  {img_area_rgb.shape[1]} × {img_area_rgb.shape[0]} px")
@@ -380,7 +380,7 @@ with col_orig:
 with col_overlay:
     title = f"Bright: {n_bright}" + (f"  |  Faint: {n_faint}" if detect_faint else "")
     st.subheader(title)
-    st.image(overlay, use_container_width=True)
+    st.image(overlay, width="stretch")
     legend = "Plasma = bright (purple=small → yellow=large)"
     if detect_faint:
         legend += "  |  Cyan = faint/subsurface"
@@ -388,7 +388,7 @@ with col_overlay:
 
 with col_binary:
     st.subheader("Segmented Mask")
-    st.image(composite_mask, use_container_width=True)
+    st.image(composite_mask, width="stretch")
     cap = f"Bright threshold = {auto_thresh}"
     if detect_faint and faint_thresh_low is not None:
         cap += f"  |  Faint range = {faint_thresh_low}–{faint_thresh_high}"
@@ -468,7 +468,7 @@ with res_right:
             else:
                 display, label = f"{v:.3f}", k
             stat_rows.append({"Metric": label, "Value": display})
-        st.dataframe(pd.DataFrame(stat_rows), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(stat_rows), hide_index=True, width="stretch")
 
     # CSV
     CSV_COLS = [
@@ -491,7 +491,7 @@ with res_right:
             data=csv_bytes,
             file_name=f"{base_name}_crystals.csv",
             mime="text/csv",
-            use_container_width=True,
+            width="stretch",
         )
 
         dl1, dl2, dl3 = st.columns(3)
@@ -499,20 +499,20 @@ with res_right:
             st.download_button("⬇ Overlay image",
                                data=_img_to_png(overlay),
                                file_name=f"{base_name}_overlay.png",
-                               mime="image/png", use_container_width=True)
+                               mime="image/png", width="stretch")
         with dl2:
             st.download_button("⬇ Segmented mask",
                                data=_img_to_png(composite_mask),
                                file_name=f"{base_name}_mask.png",
-                               mime="image/png", use_container_width=True)
+                               mime="image/png", width="stretch")
         with dl3:
             st.download_button("⬇ Original (cropped)",
                                data=_img_to_png(img_area_rgb),
                                file_name=f"{base_name}_original.png",
-                               mime="image/png", use_container_width=True)
+                               mime="image/png", width="stretch")
 
         with st.expander("View all crystal measurements"):
-            st.dataframe(df_export, use_container_width=True)
+            st.dataframe(df_export, width="stretch")
 
 # ── Size-class breakdown ──────────────────────────────────────────────────────
 if all_measurements:
@@ -552,7 +552,7 @@ if all_measurements:
                 "Area fraction (%)": f"{afrac:.1f}%",
                 "Mean Ø (µm)": f"{meand:.3f}",
             })
-        st.dataframe(pd.DataFrame(sc_rows), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(sc_rows), hide_index=True, width="stretch")
 
 # ── Spatial Analysis ──────────────────────────────────────────────────────────
 st.divider()
@@ -654,19 +654,19 @@ st.subheader("Crystal ID Map")
 
 lbl_ov_col, lbl_mask_col = st.columns(2)
 with lbl_ov_col:
-    st.image(overlay_labeled, use_container_width=True,
+    st.image(overlay_labeled, width="stretch",
              caption="Overlay — each crystal numbered at its centroid")
     st.download_button("⬇ Labeled overlay",
                        data=_img_to_png(overlay_labeled),
                        file_name=f"{base_name}_labeled_overlay.png",
-                       mime="image/png", use_container_width=True)
+                       mime="image/png", width="stretch")
 with lbl_mask_col:
-    st.image(binary_segmented_labeled, use_container_width=True,
+    st.image(binary_segmented_labeled, width="stretch",
              caption="Segmented mask — each crystal coloured and numbered")
     st.download_button("⬇ Labeled segmented mask",
                        data=_img_to_png(binary_segmented_labeled),
                        file_name=f"{base_name}_segmented_mask_labeled.png",
-                       mime="image/png", use_container_width=True)
+                       mime="image/png", width="stretch")
 
 if all_measurements:
     tbl_rows = []
@@ -683,7 +683,7 @@ if all_measurements:
             "NN dist (µm)":   f"{m['nearest_neighbor_um']:.3f}" if m.get("nearest_neighbor_um") else "—",
         })
     st.dataframe(pd.DataFrame(tbl_rows).set_index("ID"),
-                 use_container_width=True, height=400)
+                 width="stretch", height=400)
 
 # ── Manual correction ─────────────────────────────────────────────────────────
 with st.expander("Manual correction — remove false positives"):
@@ -709,7 +709,7 @@ with st.expander("Manual correction — remove false positives"):
                     else:
                         display, label = f"{v:.3f}", k
                     corr_rows.append({"Metric": label, "Value": display})
-                st.dataframe(pd.DataFrame(corr_rows), hide_index=True, use_container_width=True)
+                st.dataframe(pd.DataFrame(corr_rows), hide_index=True, width="stretch")
 
                 df_corr = pd.DataFrame(filtered)
                 df_corr = df_corr[[c for c in CSV_COLS if c in df_corr.columns]]
@@ -717,7 +717,7 @@ with st.expander("Manual correction — remove false positives"):
                 st.download_button("⬇ Download corrected CSV",
                                    data=df_corr.to_csv(index=False).encode(),
                                    file_name=f"{base_name}_corrected.csv",
-                                   mime="text/csv", use_container_width=True)
+                                   mime="text/csv", width="stretch")
         except ValueError:
             st.error("Invalid format. Enter comma-separated integers, e.g.: 3, 7, 15")
 
@@ -793,7 +793,7 @@ if batch_files and st.button("▶ Run Batch Analysis", type="primary"):
 
     if batch_summary:
         st.markdown("**Per-image summary**")
-        st.dataframe(pd.DataFrame(batch_summary), hide_index=True, use_container_width=True)
+        st.dataframe(pd.DataFrame(batch_summary), hide_index=True, width="stretch")
 
     if all_batch_meas:
         all_d_um = [m["diameter_um"] for m in all_batch_meas]
@@ -829,5 +829,5 @@ if batch_files and st.button("▶ Run Batch Analysis", type="primary"):
             data=df_b.to_csv(index=False).encode(),
             file_name="batch_crystals.csv",
             mime="text/csv",
-            use_container_width=True,
+            width="stretch",
         )
